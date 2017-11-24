@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  nsq:
+    image: nsqio/nsq
+    command: /nsqlookupd
+  app:
+    build:
+      context: .
+      dockerfile: Docker/app/Dockerfile
+    
