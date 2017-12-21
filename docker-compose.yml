@@ -11,10 +11,10 @@ services:
         - MONGO_DATA_DIR=/data/db
         - MONGO_LOG_DIR=/dev/null
       volumes:
-        - ./_data/mongo:/data/db
+        - ./_data/mongo:/data/dbgit
       command: mongod --smallfiles --logpath=/dev/null # --quiet
   app:
     build:
       context: .
-      dockerfile: ./Docker/app/Dockerfile
+      dockerfile: ./Docker/TwitterVotes/Dockerfile
     
