@@ -1,19 +1,32 @@
-folder ?= .
-bin ?= 
+.PHONY: help dependencies tests build install start
+
+bin = twitter-votes
+folder = ./bin
+image = jaumecapdevila/twitter-votes
 
 help:
-	@echo "Go distributed system"
+	@echo "Twitter votes"
 	@echo ""
-	@echo " dependencies   gets all the required dependencies"
-	@echo " build        compile and installs the binary"
-	@echo " install      get all the dependencies and install dependencies"
+	@echo " dependencies gets all the required dependencies"
+	@echo " build compile the go binary"
+	@echo " install runs both previous steps"
 
 dependencies:
+	@echo "Installing package dependencies"
+	@go get -u github.com/kardianos/govendor
+	@govendor sync
 
-build: 
-	@go build -a -o $(bin)
-	@cp $(bin) $(folder)/$(bin)
+tests:
+	@echo "Executing unit tests..."
+	@govendor test +local
 
-install: dependencies build
+build:
+	@echo "Building the $(bin) binary"
+	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o $(folder)/$(bin)
+	@echo "Building docker image"
+	docker build -t $(image) .
 
-.PHONY: help dependencies build install
+start: dependencies build
+	@echo "Starting worker service"
+	cd ../
+	docker-compose up -d worker

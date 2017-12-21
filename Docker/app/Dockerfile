@@ -1,14 +1,14 @@
-FROM golang:1.9-stretch
-ENV CODE=/go/src/jaumecapdevila/go-distributed-system
+FROM alpine:3.7
+# Define the current working dir
 ENV WORKDIR=/app
-ENV BIN=go-distributed-system
-
+# Define the name of binary that is going to be used as the entrypoint of the image
+ENV BIN=twitter-votes
+RUN apk -U add ca-certificates
+# Copy the generated binary inside the container
+COPY ./bin/${BIN} ${WORKDIR}/${BIN}
+# Copy configuration file inside the container
+COPY ./app/config.yml ${WORKDIR}/app/config.yml
+# Establish the working dir defined in the env variable
 WORKDIR $WORKDIR
-
-RUN apt-get update && \
-    apt-get install git make
-
-ADD ./src $CODE
-RUN cd $CODE && make install folder=$WORKDIR bin=$BIN
-
-ENTRYPOINT "$WORKDIR/$BIN"
+# Establish the binary as the entrypoint
+ENTRYPOINT "${WORKDIR}/${BIN}"
