@@ -1,3 +1,4 @@
 /src/vendor/*/
 /src/bin/
+setup.sh
 /_data/
