@@ -27,6 +27,6 @@ build:
 	docker build -t $(image) .
 
 start: dependencies build
-	@echo "Starting worker service"
+	@echo "Starting twitter votes service"
 	cd ../
-	docker-compose up -d worker
+	docker-compose up -d app
