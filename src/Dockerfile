@@ -5,7 +5,7 @@ ENV WORKDIR=/app
 ENV BIN=twitter-votes
 RUN apk -U add ca-certificates
 # Copy the generated binary inside the container
-COPY ./src/bin/${BIN} ${WORKDIR}/${BIN}
+COPY ./bin/${BIN} ${WORKDIR}/${BIN}
 # Establish the working dir defined in the env variable
 WORKDIR $WORKDIR
 # Establish the binary as the entrypoint
