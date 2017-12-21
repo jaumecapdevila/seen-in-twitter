@@ -16,16 +16,14 @@ services:
       - 4150
       - 4151
   mongo:
-     image: mongo:latest
-      container_name: "twitter_votes_database"
-      environment:
-        - MONGO_DATA_DIR=/data/db
-        - MONGO_LOG_DIR=/dev/null
-      volumes:
-        - ./_data/mongo:/data/dbgit
-      command: mongod --smallfiles --logpath=/dev/null # --quiet
+    image: mongo:latest
+    container_name: "twitter_votes_database"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./_data/mongo:/data/dbgit
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
   app:
-    build:
-      context: .
-      dockerfile: ./Docker/TwitterVotes/Dockerfile
+    image: jaumecapdevila/twitter-votes
     
