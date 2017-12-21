@@ -27,6 +27,10 @@ var (
 var conn net.Conn
 var reader io.ReadCloser
 
+type tweet struct {
+	Text string
+}
+
 func makeRequest(req *http.Request, params url.Values) (*http.Response, error) {
 	authSetupOnce.Do(func() {
 		setupTwitterAuth()
