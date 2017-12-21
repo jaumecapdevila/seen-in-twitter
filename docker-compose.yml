@@ -4,6 +4,15 @@ services:
   nsq:
     image: nsqio/nsq
     command: /nsqlookupd
+  mongo:
+     image: mongo:latest
+      container_name: "twitter_votes_database"
+      environment:
+        - MONGO_DATA_DIR=/data/db
+        - MONGO_LOG_DIR=/dev/null
+      volumes:
+        - ./_data/mongo:/data/db
+      command: mongod --smallfiles --logpath=/dev/null # --quiet
   app:
     build:
       context: .
