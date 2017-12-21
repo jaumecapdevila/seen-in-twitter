@@ -9,10 +9,22 @@
 			"revisionTime": "2017-10-30T00:05:02Z"
 		},
 		{
+			"checksumSHA1": "G69FbA3FT6f9Ooq7LG/NLEhAVfY=",
+			"path": "github.com/garyburd/go-oauth/oauth",
+			"revision": "4cff9ef7b7003713efa191899dbaab8fa75e3e73",
+			"revisionTime": "2017-10-04T15:14:16Z"
+		},
+		{
 			"checksumSHA1": "p/8vSviYF91gFflhrt5vkyksroo=",
 			"path": "github.com/golang/snappy",
 			"revision": "553a641470496b2327abcac10b36396bd98e45c9",
 			"revisionTime": "2017-02-15T23:32:05Z"
+		},
+		{
+			"checksumSHA1": "+ao5OeNsFj1ZJqsaS55I3oAMrcY=",
+			"path": "github.com/joeshaw/envdecode",
+			"revision": "6326cbed175e32cd5183be1cc1027e0823c91edb",
+			"revisionTime": "2016-06-25T03:51:10Z"
 		},
 		{
 			"checksumSHA1": "b/G7DysjaGa3URYYRIFWap4PgZo=",
@@ -55,6 +67,12 @@
 			"path": "github.com/stretchr/tracer",
 			"revision": "66d3696bba973e1697f7d68413b3f19c6d6e2a7c",
 			"revisionTime": "2014-01-24T18:41:52Z"
+		},
+		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
+			"path": "golang.org/x/net/context",
+			"revision": "d866cfc389cec985d6fda2859936a575a55a3ab6",
+			"revisionTime": "2017-12-11T20:45:21Z"
 		},
 		{
 			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
