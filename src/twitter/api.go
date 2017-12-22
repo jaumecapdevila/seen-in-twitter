@@ -2,69 +2,16 @@ package twitter
 
 import (
 	"encoding/json"
-	"io"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/jaumecapdevila/twitter-votes/src/persistence"
 )
 
-var (
-	httpClient *http.Client
-)
-
-var conn net.Conn
-var reader io.ReadCloser
-
-type tweet struct {
-	Text string
-}
-
-func makeRequest(req *http.Request, params url.Values) (*http.Response, error) {
-	authSetupOnce.Do(func() {
-		authorizeClient()
-		httpClient = &http.Client{
-			Transport: &http.Transport{
-				Dial: dial,
-			},
-		}
-	})
-	formEnc := params.Encode()
-	req.Header.Set("Content-Type", "application/x-www-form-urlencode")
-	req.Header.Set("Content-Length", strconv.Itoa(len(formEnc)))
-	req.Header.Set("Authorization", authClient.AuthorizationHeader(creds, "POST", req.URL, params))
-	return httpClient.Do(req)
-}
-
-func dial(netw, addr string) (net.Conn, error) {
-	if conn != nil {
-		conn.Close()
-		conn = nil
-	}
-	netc, err := net.DialTimeout(netw, addr, time.Second*5)
-	if err != nil {
-		return nil, err
-	}
-	conn = netc
-	return netc, nil
-}
-
-// CloseConn closes the current connection to the twitter Stream
-func CloseConn() {
-	if conn != nil {
-		conn.Close()
-	}
-	if reader != nil {
-		reader.Close()
-	}
-}
-
-func readFromTwitter(votes chan<- string) {
+func read(votes chan<- string) {
 	options, err := persistence.LoadOptions()
 	if err != nil {
 		log.Println("Failed to load options:", err)
@@ -105,12 +52,12 @@ func readFromTwitter(votes chan<- string) {
 	}
 }
 
-// StartTwitterStream opens stream with the twitter API
-func StartTwitterStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
-	stoppedchan := make(chan struct{}, 1)
+// StartStream opens stream with the twitter API
+func StartStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
+	stoppedChan := make(chan struct{}, 1)
 	go func() {
 		defer func() {
-			stoppedchan <- struct{}{}
+			stoppedChan <- struct{}{}
 		}()
 		for {
 			select {
@@ -119,11 +66,11 @@ func StartTwitterStream(stopChan <-chan struct{}, votes chan<- string) <-chan st
 				return
 			default:
 				log.Println("Querying Twitter...")
-				readFromTwitter(votes)
+				read(votes)
 				log.Println("(waiting)")
 				time.Sleep(10 * time.Second) // wait before reconnecting
 			}
 		}
 	}()
-	return stoppedchan
+	return stoppedChan
 }
