@@ -6,7 +6,8 @@ import (
 	nsq "github.com/bitly/go-nsq"
 )
 
-func publishVotes(votes <-chan string) <-chan struct{} {
+// PublishVotes sends the votes to the nsq queue
+func PublishVotes(votes <-chan string) <-chan struct{} {
 	stopChan := make(chan struct{}, 1)
 	// TODO: Handle the error properly
 	pub, _ := nsq.NewProducer("nsqd:4150", nsq.NewConfig())

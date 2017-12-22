@@ -134,7 +134,8 @@ func readFromTwitter(votes chan<- string) {
 	}
 }
 
-func startTwitterStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
+// StartTwitterStream opens stream with the twitter API
+func StartTwitterStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
 	stoppedchan := make(chan struct{}, 1)
 	go func() {
 		defer func() {

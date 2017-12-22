@@ -12,14 +12,16 @@ type poll struct {
 	Options []string
 }
 
-func dialDB() error {
+// DialDB opens a connection to the database
+func DialDB() error {
 	var err error
 	log.Println("dialing mongodb: localhost")
 	db, err = mgo.Dial("twitter_votes_database")
 	return err
 }
 
-func closeDB() {
+// CloseDB closes the current connection to the database
+func CloseDB() {
 	db.Close()
 	log.Println("Closed database connection")
 }
