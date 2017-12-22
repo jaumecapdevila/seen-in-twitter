@@ -83,7 +83,8 @@ func dial(netw, addr string) (net.Conn, error) {
 	return netc, nil
 }
 
-func closseConn() {
+// CloseConn closes the current connection to the twitter Stream
+func CloseConn() {
 	if conn != nil {
 		conn.Close()
 	}
