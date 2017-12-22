@@ -1,12 +1,14 @@
 package twittervotes
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -87,5 +89,46 @@ func closseConn() {
 	}
 	if reader != nil {
 		reader.Close()
+	}
+}
+
+func readFromTwitter(votes chan<- string) {
+	options, err := loadOptions()
+	if err != nil {
+		log.Println("Failed to load options:", err)
+		return
+	}
+	u, err := url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
+	if err != nil {
+		log.Println("Creating filter request failed:", err)
+		return
+	}
+	query := make(url.Values)
+	query.Set("track", strings.Join(options, ","))
+	req, err := http.NewRequest("POST", u.String(), strings.NewReader(query.Encode()))
+	if err != nil {
+		log.Println("Creating filter request failed:", err)
+	}
+	resp, err := makeRequest(req, query)
+	if err != nil {
+		log.Println("Making request failed:", err)
+		return
+	}
+	reader := resp.Body
+	decoder := json.NewDecoder(reader)
+	for {
+		var t tweet
+		if err := decoder.Decode(&t); err != nil {
+			break
+		}
+		for _, option := range options {
+			if strings.Contains(
+				strings.ToLower(t.Text),
+				strings.ToLower(option),
+			) {
+				log.Println("Vote:", option)
+				votes <- option
+			}
+		}
 	}
 }
