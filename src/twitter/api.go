@@ -36,7 +36,7 @@ func read(votes chan<- string) {
 	reader := resp.Body
 	decoder := json.NewDecoder(reader)
 	for {
-		var t tweet
+		var t Tweet
 		if err := decoder.Decode(&t); err != nil {
 			break
 		}
