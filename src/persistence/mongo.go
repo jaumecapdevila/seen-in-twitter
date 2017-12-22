@@ -8,26 +8,32 @@ import (
 
 var db *mgo.Session
 
+// MongoDB represents a wrapper around the mongodb connection
+type MongoDB struct {
+	DB *mgo.Session
+}
 type poll struct {
 	Options []string
 }
 
-// DialDB opens a connection to the database
-func DialDB() error {
+// New returns a new MongoDB connection or an error otherwise
+func New(source string) (*MongoDB, error) {
 	var err error
-	log.Println("dialing mongodb: localhost")
-	db, err = mgo.Dial("twitter_votes_database")
-	return err
+	db, err = mgo.Dial(source)
+	if err != nil {
+		return &MongoDB{}, err
+	}
+	return &MongoDB{
+		DB: db,
+	}, nil
 }
 
-// CloseDB closes the current connection to the database
-func CloseDB() {
-	db.Close()
+func (m *MongoDB) closeConnection() {
+	m.DB.Close()
 	log.Println("Closed database connection")
 }
 
-// LoadOptions read all the available options from the polls
-func LoadOptions() ([]string, error) {
+func (m *MongoDB) loadOptions() ([]string, error) {
 	var options []string
 	iter := db.DB("ballots").C("polls").Find(nil).Iter()
 	var p poll
