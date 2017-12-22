@@ -8,7 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jaumecapdevila/twitter-votes/src/twittervotes"
+	"github.com/jaumecapdevila/twitter-votes/src/persistence"
+	"github.com/jaumecapdevila/twitter-votes/src/queue"
+	"github.com/jaumecapdevila/twitter-votes/src/twitter"
 )
 
 func main() {
@@ -22,21 +24,21 @@ func main() {
 		stopLock.Unlock()
 		log.Println("Stopping...")
 		stopChan <- struct{}{}
-		twittervotes.CloseConn()
+		twitter.CloseConn()
 	}()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	if err := twittervotes.DialDB(); err != nil {
+	if err := persistence.DialDB(); err != nil {
 		log.Fatalln("failed to dial MongoDB:", err)
 	}
-	defer twittervotes.CloseDB()
+	defer persistence.CloseDB()
 	votes := make(chan string) // chan for votes
-	publisherStoppedChan := twittervotes.PublishVotes(votes)
-	twitterStoppedChan := twittervotes.StartTwitterStream(stopChan, votes)
+	publisherStoppedChan := queue.PublishVotes(votes)
+	twitterStoppedChan := twitter.StartTwitterStream(stopChan, votes)
 	go func() {
 		for {
 			time.Sleep(1 * time.Minute)
-			twittervotes.CloseConn()
+			twitter.CloseConn()
 			stopLock.Lock()
 			if stop {
 				stopLock.Unlock()

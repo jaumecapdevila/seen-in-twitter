@@ -1,4 +1,4 @@
-package twittervotes
+package queue
 
 import (
 	"log"

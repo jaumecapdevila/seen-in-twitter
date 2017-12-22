@@ -1,4 +1,4 @@
-package twittervotes
+package twitter
 
 import (
 	"encoding/json"
@@ -9,21 +9,13 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/garyburd/go-oauth/oauth"
-	"github.com/joeshaw/envdecode"
+	"github.com/jaumecapdevila/twitter-votes/src/persistence"
 )
 
 var (
-	authClient *oauth.Client
-	creds      *oauth.Credentials
-)
-
-var (
-	authSetupOnce sync.Once
-	httpClient    *http.Client
+	httpClient *http.Client
 )
 
 var conn net.Conn
@@ -35,7 +27,7 @@ type tweet struct {
 
 func makeRequest(req *http.Request, params url.Values) (*http.Response, error) {
 	authSetupOnce.Do(func() {
-		setupTwitterAuth()
+		authorizeClient()
 		httpClient = &http.Client{
 			Transport: &http.Transport{
 				Dial: dial,
@@ -49,27 +41,6 @@ func makeRequest(req *http.Request, params url.Values) (*http.Response, error) {
 	return httpClient.Do(req)
 }
 
-func setupTwitterAuth() {
-	var ts struct {
-		ConsumerKey    string `env:"SP_TWITTER_KEY,required"`
-		ConsumerSecret string `env:"SP_TWITTER_SECRET,required"`
-		AccessToken    string `env:"SP_TWITTER_ACCESSTOKEN,required"`
-		AccessSecret   string `env:"SP_TWITTER_ACCESSSECRET,required"`
-	}
-	if err := envdecode.Decode(&ts); err != nil {
-		log.Fatal(err)
-	}
-	creds = &oauth.Credentials{
-		Token:  ts.AccessToken,
-		Secret: ts.AccessSecret,
-	}
-	authClient = &oauth.Client{
-		Credentials: oauth.Credentials{
-			Token:  ts.ConsumerKey,
-			Secret: ts.ConsumerSecret,
-		},
-	}
-}
 func dial(netw, addr string) (net.Conn, error) {
 	if conn != nil {
 		conn.Close()
@@ -94,7 +65,7 @@ func CloseConn() {
 }
 
 func readFromTwitter(votes chan<- string) {
-	options, err := loadOptions()
+	options, err := persistence.LoadOptions()
 	if err != nil {
 		log.Println("Failed to load options:", err)
 		return

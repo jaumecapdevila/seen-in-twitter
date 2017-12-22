@@ -1,4 +1,4 @@
-package twittervotes
+package persistence
 
 import (
 	"log"
@@ -26,7 +26,8 @@ func CloseDB() {
 	log.Println("Closed database connection")
 }
 
-func loadOptions() ([]string, error) {
+// LoadOptions read all the available options from the polls
+func LoadOptions() ([]string, error) {
 	var options []string
 	iter := db.DB("ballots").C("polls").Find(nil).Iter()
 	var p poll
