@@ -45,18 +45,8 @@ func loadConfig() {
 
 func main() {
 	defer mongoDB.CloseConnection()
-	//var stopLock sync.Mutex
-	//stop := false
 	stopChan := make(chan struct{}, 1)
 	signalChan := make(chan os.Signal, 1)
-	// go func() {
-	// 	stopLock.Lock()
-	// 	stop = true
-	// 	stopLock.Unlock()
-	// 	log.Println("Stopping...")
-	// 	stopChan <- struct{}{}
-	// 	twitter.CloseConn()
-	// }()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	votes := make(chan string)
 	publisherStoppedChan := nsq.PublishVotes(votes)
@@ -69,5 +59,6 @@ func main() {
 	}()
 	<-twitterStoppedChan
 	close(votes)
+	votes <- "bitcoin"
 	<-publisherStoppedChan
 }

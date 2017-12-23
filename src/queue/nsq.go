@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"log"
 
 	nsq "github.com/bitly/go-nsq"
@@ -21,11 +22,13 @@ func New(config string) *NSQQueue {
 // PublishVotes sends the votes to the nsq queue
 func (n *NSQQueue) PublishVotes(votes <-chan string) <-chan struct{} {
 	stopChan := make(chan struct{}, 1)
-	// TODO: Handle the error properly
 	pub, _ := nsq.NewProducer(n.ProducerConfig, nsq.NewConfig())
 	go func() {
 		for vote := range votes {
-			pub.Publish("votes", []byte(vote))
+			err := pub.Publish("votes", []byte(vote))
+			if err != nil {
+				fmt.Println("Publishing vote failed with error: ", err)
+			}
 		}
 		log.Println("Publisher: Stopping")
 		pub.Stop()

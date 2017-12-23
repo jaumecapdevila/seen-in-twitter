@@ -3,7 +3,6 @@ package twitter
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -40,8 +39,6 @@ func read(db *persistence.MongoDB, votes chan<- string) {
 		return
 	}
 	reader := resp.Body
-	bodybytes, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bodybytes))
 	decoder := json.NewDecoder(reader)
 	for {
 		var t Tweet
@@ -49,12 +46,13 @@ func read(db *persistence.MongoDB, votes chan<- string) {
 			log.Println("Decoding response failed with the following error: ", err)
 			break
 		}
+		fmt.Println(t)
 		for _, option := range options {
 			if strings.Contains(
 				strings.ToLower(t.Text),
 				strings.ToLower(option),
 			) {
-				log.Println("Vote:", option)
+				log.Println("Vote: ", option)
 				votes <- option
 			}
 		}
