@@ -59,6 +59,5 @@ func main() {
 	}()
 	<-twitterStoppedChan
 	close(votes)
-	votes <- "bitcoin"
 	<-publisherStoppedChan
 }
