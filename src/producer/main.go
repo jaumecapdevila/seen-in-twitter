@@ -26,6 +26,7 @@ func init() {
 func setupDatabase() {
 	var err error
 	if mongoDB, err = persistence.New(viper.GetString("database.source")); err != nil {
+		fmt.Println(viper.GetString("database.source"))
 		log.Fatalf("Establishing a connection to the database failed with the following error: %s", err.Error())
 	}
 }
