@@ -11,19 +11,19 @@ import (
 	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
 )
 
+var topics = []string{
+	"recetas",
+	"cocina",
+}
+
 func read(db *persistence.MongoDB, tweets chan<- Tweet) {
-	options, err := db.LoadOptions()
-	if err != nil {
-		log.Println("Failed to load options:", err)
-		return
-	}
 	u, err := url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
 	if err != nil {
 		log.Println("Creating filter request failed: ", err)
 		return
 	}
 	query := make(url.Values)
-	query.Set("track", strings.Join(options, ","))
+	query.Set("track", strings.Join(topics, ","))
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(query.Encode()))
 	if err != nil {
 		log.Println("Creating filter request failed: ", err)
@@ -45,12 +45,12 @@ func read(db *persistence.MongoDB, tweets chan<- Tweet) {
 			log.Println("Decoding response failed with the following error: ", err)
 			break
 		}
-		for _, option := range options {
+		for _, topic := range topics {
 			if strings.Contains(
 				strings.ToLower(t.Text),
-				strings.ToLower(option),
+				strings.ToLower(topic),
 			) {
-				t.Topic = option
+				t.Topic = topic
 				tweets <- t
 			}
 		}
@@ -68,6 +68,7 @@ func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, tweets chan<
 			select {
 			case <-stopChan:
 				log.Println("Stopping Twitter stream")
+				CloseConn()
 				return
 			default:
 				log.Println("Querying Twitter...")

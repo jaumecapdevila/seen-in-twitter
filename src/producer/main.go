@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
 	nsqeueu "github.com/jaumecapdevila/seen-in-twitter/src/producer/queue"
@@ -53,10 +52,8 @@ func main() {
 	publisherStoppedChan := nsq.PublishVotes(tweets)
 	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, tweets)
 	go func() {
-		for {
-			time.Sleep(1 * time.Minute)
-			twitter.CloseConn()
-		}
+		<-signalChan
+		stopChan <- struct{}{}
 	}()
 	<-twitterStoppedChan
 	close(tweets)

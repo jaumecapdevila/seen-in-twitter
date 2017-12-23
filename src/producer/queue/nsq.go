@@ -30,6 +30,7 @@ func (n *NSQQueue) PublishVotes(tweets <-chan twitter.Tweet) <-chan struct{} {
 			if err != nil {
 				fmt.Println("Publishing tweet failed with error: ", err)
 			}
+			fmt.Println("Tweet published to queue: ", tweet)
 		}
 		log.Println("Publisher: Stopping")
 		pub.Stop()
