@@ -37,4 +37,5 @@ services:
       - SP_TWITTER_SECRET=${SP_TWITTER_SECRET}
       - SP_TWITTER_ACCESSTOKEN=${SP_TWITTER_ACCESSTOKEN}
       - SP_TWITTER_ACCESSSECRET=${SP_TWITTER_ACCESSSECRET}
-    
+  seenintwitter-consumer:
+    image: jaumecapdevila/seen-in-twitter-consumer
