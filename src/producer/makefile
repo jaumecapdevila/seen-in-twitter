@@ -1,8 +1,8 @@
 .PHONY: help dependencies tests build install start
 
-bin = seenintwitter
+bin = seen-in-twitter
 folder = ./bin
-image = jaumecapdevila/seenintwitter
+image = jaumecapdevila/seen-in-twitter-producer
 
 help:
 	@echo "Seen in Twitter"
