@@ -10,7 +10,7 @@ var db *mgo.Session
 
 // MongoDB represents a wrapper around the mongodb connection
 type MongoDB struct {
-	DB *mgo.Session
+	db *mgo.Session
 }
 type poll struct {
 	Options []string
@@ -24,16 +24,18 @@ func New(source string) (*MongoDB, error) {
 		return &MongoDB{}, err
 	}
 	return &MongoDB{
-		DB: db,
+		db: db,
 	}, nil
 }
 
-func (m *MongoDB) closeConnection() {
-	m.DB.Close()
+// CloseConnection closes current mongo db session
+func (m *MongoDB) CloseConnection() {
+	m.db.Close()
 	log.Println("Closed database connection")
 }
 
-func (m *MongoDB) loadOptions() ([]string, error) {
+// LoadOptions read all the available options from the polls
+func (m *MongoDB) LoadOptions() ([]string, error) {
 	var options []string
 	iter := db.DB("ballots").C("polls").Find(nil).Iter()
 	var p poll

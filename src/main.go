@@ -11,9 +11,33 @@ import (
 	"github.com/jaumecapdevila/twitter-votes/src/persistence"
 	"github.com/jaumecapdevila/twitter-votes/src/queue"
 	"github.com/jaumecapdevila/twitter-votes/src/twitter"
+	"github.com/spf13/viper"
 )
 
+var mongoDB *persistence.MongoDB
+
+func init() {
+	loadConfig()
+	setupDatabase()
+}
+
+func setupDatabase() {
+	if mongoDB, err := persistence.New(viper.Get("database.source")); err != nil {
+		log.Fatal("Failed to establishing a connection with the database")
+	}
+}
+
+func loadConfig() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("./config")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Failed to load the configuration file")
+	}
+}
+
 func main() {
+	defer mongoDB.CloseConnection()
 	var stopLock sync.Mutex
 	stop := false
 	stopChan := make(chan struct{}, 1)
@@ -28,10 +52,6 @@ func main() {
 	}()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	if err := persistence.DialDB(); err != nil {
-		log.Fatalln("failed to dial MongoDB:", err)
-	}
-	defer persistence.CloseDB()
 	votes := make(chan string) // chan for votes
 	publisherStoppedChan := queue.PublishVotes(votes)
 	twitterStoppedChan := twitter.StartTwitterStream(stopChan, votes)
