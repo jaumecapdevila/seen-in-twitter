@@ -59,7 +59,6 @@ func main() {
 		twitter.CloseConn()
 	}()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-
 	votes := make(chan string)
 	publisherStoppedChan := nsq.PublishVotes(votes)
 	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, votes)
