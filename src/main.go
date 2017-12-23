@@ -48,9 +48,9 @@ func main() {
 	stopChan := make(chan struct{}, 1)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	votes := make(chan string)
-	publisherStoppedChan := nsq.PublishVotes(votes)
-	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, votes)
+	tweets := make(chan twitter.Tweet)
+	publisherStoppedChan := nsq.PublishVotes(tweets)
+	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, tweets)
 	go func() {
 		for {
 			time.Sleep(1 * time.Minute)
@@ -58,6 +58,6 @@ func main() {
 		}
 	}()
 	<-twitterStoppedChan
-	close(votes)
+	close(tweets)
 	<-publisherStoppedChan
 }

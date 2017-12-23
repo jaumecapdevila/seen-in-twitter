@@ -2,7 +2,6 @@ package twitter
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,7 +11,7 @@ import (
 	"github.com/jaumecapdevila/twitter-votes/src/persistence"
 )
 
-func read(db *persistence.MongoDB, votes chan<- string) {
+func read(db *persistence.MongoDB, tweets chan<- Tweet) {
 	options, err := db.LoadOptions()
 	if err != nil {
 		log.Println("Failed to load options:", err)
@@ -46,21 +45,20 @@ func read(db *persistence.MongoDB, votes chan<- string) {
 			log.Println("Decoding response failed with the following error: ", err)
 			break
 		}
-		fmt.Println(t)
 		for _, option := range options {
 			if strings.Contains(
 				strings.ToLower(t.Text),
 				strings.ToLower(option),
 			) {
-				log.Println("Vote: ", option)
-				votes <- option
+				t.Topic = option
+				tweets <- t
 			}
 		}
 	}
 }
 
 // StartStream opens stream with the twitter API
-func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
+func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, tweets chan<- Tweet) <-chan struct{} {
 	stoppedChan := make(chan struct{}, 1)
 	go func() {
 		defer func() {
@@ -73,7 +71,7 @@ func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, votes chan<-
 				return
 			default:
 				log.Println("Querying Twitter...")
-				read(db, votes)
+				read(db, tweets)
 				log.Println("(waiting)")
 				time.Sleep(10 * time.Second) // wait before reconnecting
 			}

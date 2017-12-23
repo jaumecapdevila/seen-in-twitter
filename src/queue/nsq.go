@@ -5,6 +5,7 @@ import (
 	"log"
 
 	nsq "github.com/bitly/go-nsq"
+	"github.com/jaumecapdevila/twitter-votes/src/twitter"
 )
 
 // NSQQueue to publish votes to the nsq queue
@@ -20,14 +21,14 @@ func New(config string) *NSQQueue {
 }
 
 // PublishVotes sends the votes to the nsq queue
-func (n *NSQQueue) PublishVotes(votes <-chan string) <-chan struct{} {
+func (n *NSQQueue) PublishVotes(tweets <-chan twitter.Tweet) <-chan struct{} {
 	stopChan := make(chan struct{}, 1)
 	pub, _ := nsq.NewProducer(n.ProducerConfig, nsq.NewConfig())
 	go func() {
-		for vote := range votes {
-			err := pub.Publish("votes", []byte(vote))
+		for tweet := range tweets {
+			err := pub.Publish(tweet.Topic, []byte(tweet.Text))
 			if err != nil {
-				fmt.Println("Publishing vote failed with error: ", err)
+				fmt.Println("Publishing tweet failed with error: ", err)
 			}
 		}
 		log.Println("Publisher: Stopping")
