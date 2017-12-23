@@ -2,7 +2,7 @@ FROM alpine:3.7
 # Define the current working dir
 ENV WORKDIR=/app
 # Define the name of binary that is going to be used as the entrypoint of the image
-ENV BIN=twitter-votes
+ENV BIN=seen-in-twitter
 RUN apk -U add ca-certificates
 # Copy the configuration file
 COPY ./config/config.yml ${WORKDIR}/config/config.yml
