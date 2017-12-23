@@ -5,7 +5,7 @@ import (
 	"log"
 
 	nsq "github.com/bitly/go-nsq"
-	"github.com/jaumecapdevila/twitter-votes/src/twitter"
+	"github.com/jaumecapdevila/seen-in-twitter/src/producer/twitter"
 )
 
 // NSQQueue to publish votes to the nsq queue

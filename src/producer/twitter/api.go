@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jaumecapdevila/twitter-votes/src/persistence"
+	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
 )
 
 func read(db *persistence.MongoDB, tweets chan<- Tweet) {

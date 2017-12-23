@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jaumecapdevila/twitter-votes/src/persistence"
-	nsqeueu "github.com/jaumecapdevila/twitter-votes/src/queue"
-	"github.com/jaumecapdevila/twitter-votes/src/twitter"
+	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
+	nsqeueu "github.com/jaumecapdevila/seen-in-twitter/src/producer/queue"
+	"github.com/jaumecapdevila/seen-in-twitter/src/producer/twitter"
 	"github.com/spf13/viper"
 )
 

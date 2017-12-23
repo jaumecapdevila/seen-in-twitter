@@ -1,5 +1,5 @@
-/src/vendor/*/
-/src/bin/
+/src/producer/vendor/*/
+/src/producer/bin/
 setup.sh
 config.yml
 /_data/
