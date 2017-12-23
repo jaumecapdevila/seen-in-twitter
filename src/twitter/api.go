@@ -2,6 +2,8 @@ package twitter
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,25 +21,32 @@ func read(db *persistence.MongoDB, votes chan<- string) {
 	}
 	u, err := url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
 	if err != nil {
-		log.Println("Creating filter request failed:", err)
+		log.Println("Creating filter request failed: ", err)
 		return
 	}
 	query := make(url.Values)
 	query.Set("track", strings.Join(options, ","))
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(query.Encode()))
 	if err != nil {
-		log.Println("Creating filter request failed:", err)
+		log.Println("Creating filter request failed: ", err)
 	}
 	resp, err := makeRequest(req, query)
 	if err != nil {
-		log.Println("Making request failed:", err)
+		log.Println("Making request failed: ", err)
+		return
+	}
+	if resp.StatusCode != 200 {
+		log.Printf("Invalid status code %d, 200 expected: ", resp.StatusCode)
 		return
 	}
 	reader := resp.Body
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(bodybytes))
 	decoder := json.NewDecoder(reader)
 	for {
 		var t Tweet
 		if err := decoder.Decode(&t); err != nil {
+			log.Println("Decoding response failed with the following error: ", err)
 			break
 		}
 		for _, option := range options {
