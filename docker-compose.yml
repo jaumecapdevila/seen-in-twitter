@@ -31,7 +31,7 @@ services:
     volumes:
       - ./_data/mongo:/data/dbgit
     command: mongod --smallfiles --logpath=/dev/null # --quiet
-  twittervotes:
+  seenintwitter:
     image: jaumecapdevila/twitter-votes
     environment:
       - SP_TWITTER_KEY=${SP_TWITTER_KEY}

@@ -1,11 +1,11 @@
 .PHONY: help dependencies tests build install start
 
-bin = twitter-votes
+bin = seenintwitter
 folder = ./bin
-image = jaumecapdevila/twitter-votes
+image = jaumecapdevila/seenintwitter
 
 help:
-	@echo "Twitter votes"
+	@echo "Seen in Twitter"
 	@echo ""
 	@echo " dependencies gets all the required dependencies"
 	@echo " build compile the go binary"
@@ -27,6 +27,6 @@ build: dependencies
 	docker build -t $(image) .
 
 start: dependencies build
-	@echo "Starting twitter votes service"
+	@echo "Starting seen in Twitter service"
 	cd ../
 	docker-compose up -d app
