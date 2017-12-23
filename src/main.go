@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -46,18 +45,18 @@ func loadConfig() {
 
 func main() {
 	defer mongoDB.CloseConnection()
-	var stopLock sync.Mutex
-	stop := false
+	//var stopLock sync.Mutex
+	//stop := false
 	stopChan := make(chan struct{}, 1)
 	signalChan := make(chan os.Signal, 1)
-	go func() {
-		stopLock.Lock()
-		stop = true
-		stopLock.Unlock()
-		log.Println("Stopping...")
-		stopChan <- struct{}{}
-		twitter.CloseConn()
-	}()
+	// go func() {
+	// 	stopLock.Lock()
+	// 	stop = true
+	// 	stopLock.Unlock()
+	// 	log.Println("Stopping...")
+	// 	stopChan <- struct{}{}
+	// 	twitter.CloseConn()
+	// }()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	votes := make(chan string)
 	publisherStoppedChan := nsq.PublishVotes(votes)
@@ -66,12 +65,6 @@ func main() {
 		for {
 			time.Sleep(1 * time.Minute)
 			twitter.CloseConn()
-			stopLock.Lock()
-			if stop {
-				stopLock.Unlock()
-				return
-			}
-			stopLock.Unlock()
 		}
 	}()
 	<-twitterStoppedChan

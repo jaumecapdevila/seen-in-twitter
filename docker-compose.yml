@@ -31,4 +31,9 @@ services:
     command: mongod --smallfiles --logpath=/dev/null # --quiet
   app:
     image: jaumecapdevila/twitter-votes
+    environment:
+      - SP_TWITTER_KEY=${SP_TWITTER_KEY}
+      - SP_TWITTER_SECRET=${SP_TWITTER_SECRET}
+      - SP_TWITTER_ACCESSTOKEN=${SP_TWITTER_ACCESSTOKEN}
+      - SP_TWITTER_ACCESSSECRET=${SP_TWITTER_ACCESSSECRET}
     
