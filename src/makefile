@@ -26,11 +26,6 @@ build: dependencies
 	@echo "Building docker image"
 	docker build -t $(image) .
 
-setup-env:
-	@echo "Exporting all the needed env variables..."
-	@chmod +x setup.sh
-	@./setup.sh
-
 start: dependencies build
 	@echo "Starting twitter votes service"
 	cd ../
