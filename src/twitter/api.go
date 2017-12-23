@@ -11,8 +11,8 @@ import (
 	"github.com/jaumecapdevila/twitter-votes/src/persistence"
 )
 
-func read(votes chan<- string) {
-	options, err := persistence.LoadOptions()
+func read(db *persistence.MongoDB, votes chan<- string) {
+	options, err := db.LoadOptions()
 	if err != nil {
 		log.Println("Failed to load options:", err)
 		return
@@ -53,7 +53,7 @@ func read(votes chan<- string) {
 }
 
 // StartStream opens stream with the twitter API
-func StartStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
+func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, votes chan<- string) <-chan struct{} {
 	stoppedChan := make(chan struct{}, 1)
 	go func() {
 		defer func() {
@@ -66,7 +66,7 @@ func StartStream(stopChan <-chan struct{}, votes chan<- string) <-chan struct{} 
 				return
 			default:
 				log.Println("Querying Twitter...")
-				read(votes)
+				read(db, votes)
 				log.Println("(waiting)")
 				time.Sleep(10 * time.Second) // wait before reconnecting
 			}

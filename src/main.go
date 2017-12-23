@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -9,22 +10,29 @@ import (
 	"time"
 
 	"github.com/jaumecapdevila/twitter-votes/src/persistence"
-	"github.com/jaumecapdevila/twitter-votes/src/queue"
+	nsqeueu "github.com/jaumecapdevila/twitter-votes/src/queue"
 	"github.com/jaumecapdevila/twitter-votes/src/twitter"
 	"github.com/spf13/viper"
 )
 
 var mongoDB *persistence.MongoDB
+var nsq *nsqeueu.NSQQueue
 
 func init() {
 	loadConfig()
 	setupDatabase()
+	setupQueue()
 }
 
 func setupDatabase() {
-	if mongoDB, err := persistence.New(viper.Get("database.source")); err != nil {
-		log.Fatal("Failed to establishing a connection with the database")
+	var err error
+	if mongoDB, err = persistence.New(viper.GetString("database.source")); err != nil {
+		log.Fatalf("Establishing a connection to the database failed with the following error: %s", err.Error())
 	}
+}
+
+func setupQueue() {
+	nsq = nsqeueu.New(fmt.Sprintf("%s:%s", viper.GetString("queue.producer"), viper.GetString("queue.port")))
 }
 
 func loadConfig() {
@@ -52,9 +60,9 @@ func main() {
 	}()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	votes := make(chan string) // chan for votes
-	publisherStoppedChan := queue.PublishVotes(votes)
-	twitterStoppedChan := twitter.StartTwitterStream(stopChan, votes)
+	votes := make(chan string)
+	publisherStoppedChan := nsq.PublishVotes(votes)
+	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, votes)
 	go func() {
 		for {
 			time.Sleep(1 * time.Minute)
