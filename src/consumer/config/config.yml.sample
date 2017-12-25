@@ -1,7 +1,5 @@
 database:
-    source: twitter_votes_database
-queue:
-    producer: nsqd
-    port: 4150
-twitter:
-    stream-api-url: https://stream.twitter.com/1.1/statuses/filter.json
+    host: mongo
+nsqlookupd:
+    host: nsqlookupd
+    port: 4161
