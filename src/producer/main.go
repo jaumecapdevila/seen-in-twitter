@@ -7,27 +7,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
 	nsqeueu "github.com/jaumecapdevila/seen-in-twitter/src/producer/queue"
 	"github.com/jaumecapdevila/seen-in-twitter/src/producer/twitter"
 	"github.com/spf13/viper"
 )
 
-var mongoDB *persistence.MongoDB
 var nsq *nsqeueu.NSQQueue
 
 func init() {
 	loadConfig()
-	setupDatabase()
 	setupQueue()
-}
-
-func setupDatabase() {
-	var err error
-	if mongoDB, err = persistence.New(viper.GetString("database.source")); err != nil {
-		fmt.Println(viper.GetString("database.source"))
-		log.Fatalf("Establishing a connection to the database failed with the following error: %s", err.Error())
-	}
 }
 
 func setupQueue() {
@@ -44,7 +33,6 @@ func loadConfig() {
 }
 
 func main() {
-	defer mongoDB.CloseConnection()
 	stopChan := make(chan struct{}, 1)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
