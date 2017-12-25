@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/jaumecapdevila/seen-in-twitter/src/producer/persistence"
 )
 
 var topics = []string{
@@ -16,7 +14,7 @@ var topics = []string{
 	"cocina",
 }
 
-func read(db *persistence.MongoDB, tweets chan<- Tweet) {
+func read(tweets chan<- Tweet) {
 	u, err := url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
 	if err != nil {
 		log.Println("Creating filter request failed: ", err)
@@ -58,7 +56,7 @@ func read(db *persistence.MongoDB, tweets chan<- Tweet) {
 }
 
 // StartStream opens stream with the twitter API
-func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, tweets chan<- Tweet) <-chan struct{} {
+func StartStream(stopChan <-chan struct{}, tweets chan<- Tweet) <-chan struct{} {
 	stoppedChan := make(chan struct{}, 1)
 	go func() {
 		defer func() {
@@ -72,7 +70,7 @@ func StartStream(db *persistence.MongoDB, stopChan <-chan struct{}, tweets chan<
 				return
 			default:
 				log.Println("Querying Twitter...")
-				read(db, tweets)
+				read(tweets)
 				log.Println("(waiting)")
 				time.Sleep(10 * time.Second) // wait before reconnecting
 			}
