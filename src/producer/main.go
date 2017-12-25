@@ -38,7 +38,7 @@ func main() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	tweets := make(chan twitter.Tweet)
 	publisherStoppedChan := nsq.PublishVotes(tweets)
-	twitterStoppedChan := twitter.StartStream(mongoDB, stopChan, tweets)
+	twitterStoppedChan := twitter.StartStream(stopChan, tweets)
 	go func() {
 		<-signalChan
 		stopChan <- struct{}{}

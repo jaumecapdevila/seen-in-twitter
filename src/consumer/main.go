@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	nsq "github.com/bitly/go-nsq"
 	"github.com/jaumecapdevila/seen-in-twitter/src/consumer/persistence"
@@ -53,4 +56,7 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	<-signalChan
 }
