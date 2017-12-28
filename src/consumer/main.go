@@ -12,11 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var topics = []string{
-	"recetas",
-	"cocina",
-}
-
 var mongoDB *persistence.MongoDB
 
 func init() {
@@ -58,5 +53,12 @@ func main() {
 	}
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	<-signalChan
+	for {
+		select {
+		case <-signalChan:
+			q.Stop()
+		case <-q.StopChan:
+			return
+		}
+	}
 }
