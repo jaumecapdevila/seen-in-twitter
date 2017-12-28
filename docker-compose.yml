@@ -22,14 +22,21 @@ services:
       - nsqlookupd
     ports:
       - "4171"
-  mongo:
-    image: mongo:latest
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
+  database:
+    image: mariadb
+    restart: always
     volumes:
-      - ./_data/mongo:/data/dbgit
-    command: mongod --smallfiles --logpath=/dev/null # --quiet
+      - ./_data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: c00lpassw0rd
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test      
+      MYSQL_DATABASE: seen_in_twitter_db
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
   seenintwitter-producer:
     image: jaumecapdevila/seen-in-twitter-producer
     environment:
