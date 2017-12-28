@@ -1,5 +1,10 @@
-database:
-    host: mongo
+persistence:
+    mysql:
+        host: database
+        user: test
+        password: test
+        database: seen_in_twitter
+        params: charset=utf8&parseTime=True&loc=Local
 nsqlookupd:
     host: nsqlookupd
     port: 4161

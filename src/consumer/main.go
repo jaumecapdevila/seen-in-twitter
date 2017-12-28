@@ -32,7 +32,12 @@ func loadConfig() {
 
 func setupDatabase() {
 	var err error
-	if db, err = gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local"); err != nil {
+	user := viper.GetString("persistence.mysql.user")
+	password := viper.GetString("persistence.mysql.password")
+	host := viper.GetString("persistence.mysql.host")
+	dbname := viper.GetString("persistence.mysql.databse")
+	params := viper.GetString("persistence.mysql.params")
+	if db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?%s", user, password, host, dbname, params)); err != nil {
 		log.Fatalf("Establish connection to database failed with error: %s", err.Error())
 	}
 }
