@@ -35,11 +35,14 @@ func setupDatabase() {
 	user := viper.GetString("persistence.mysql.user")
 	password := viper.GetString("persistence.mysql.password")
 	host := viper.GetString("persistence.mysql.host")
-	dbname := viper.GetString("persistence.mysql.databse")
+	port := viper.GetInt("persistence.mysql.port")
+	dbname := viper.GetString("persistence.mysql.database")
 	params := viper.GetString("persistence.mysql.params")
-	if db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?%s", user, password, host, dbname, params)); err != nil {
+	if db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", user, password, host, port, dbname, params)); err != nil {
 		log.Fatalf("Establish connection to database failed with error: %s", err.Error())
 	}
+	// Migrate the schema to the database
+	db.AutoMigrate(&persistence.Tweet{})
 }
 
 func main() {

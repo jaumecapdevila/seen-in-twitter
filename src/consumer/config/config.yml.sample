@@ -1,6 +1,7 @@
 persistence:
     mysql:
         host: database
+        port: 3306
         user: test
         password: test
         database: seen_in_twitter
