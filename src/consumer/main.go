@@ -9,10 +9,12 @@ import (
 
 	nsq "github.com/bitly/go-nsq"
 	"github.com/jaumecapdevila/seen-in-twitter/src/consumer/persistence"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/spf13/viper"
 )
 
-var mongoDB *persistence.MongoDB
+var db *gorm.DB
 
 func init() {
 	loadConfig()
@@ -30,12 +32,13 @@ func loadConfig() {
 
 func setupDatabase() {
 	var err error
-	if mongoDB, err = persistence.New(viper.GetString("database.host")); err != nil {
-		log.Fatalf("Establishing a connection to the database failed with the following error: %s", err.Error())
+	if db, err = gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local"); err != nil {
+		log.Fatalf("Establish connection to database failed with error: %s", err.Error())
 	}
 }
 
 func main() {
+	defer db.Close()
 	log.Println("Connecting to nsq...")
 	q, err := nsq.NewConsumer("recetas", "recetas", nsq.NewConfig())
 	if err != nil {
@@ -44,7 +47,7 @@ func main() {
 	}
 	q.AddHandler(nsq.HandlerFunc(func(m *nsq.Message) error {
 		tweet := string(m.Body)
-		fmt.Println(tweet)
+		persistTweet(tweet)
 		return nil
 	}))
 	if err := q.ConnectToNSQLookupd(fmt.Sprintf("%s:%s", viper.GetString("nsqlookupd.host"), viper.GetString("nsqlookupd.port"))); err != nil {
@@ -61,4 +64,10 @@ func main() {
 			return
 		}
 	}
+}
+
+func persistTweet(tweetBody string) {
+	db.Create(&persistence.Tweet{
+		Text: tweetBody,
+	})
 }
